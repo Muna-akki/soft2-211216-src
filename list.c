@@ -13,40 +13,50 @@ struct node
     Node *next;
 };
 
+typedef struct list{
+    Node* begin;
+} List;
 
-Node *push_front(Node *begin, const char *str)
+List* make_list(Node* begin){
+    List* l = (List*)malloc(sizeof(List));
+    Node* b = begin;
+    *l = (List){.begin = b};
+    return l;
+}
+
+List *push_front(List* list, const char *str)
 {
     
     Node *p = (Node *)malloc(sizeof(Node));
     char *s = (char *)malloc(strlen(str) + 1);
     strcpy(s, str);
     
-    *p = (Node){.str = s , .next = begin};
-    
-    return p; 
+    *p = (Node){.str = s , .next = list->begin};
+    (list->begin) = p;
+    return list; 
 }
 
 
-Node *pop_front(Node *begin)
+List *pop_front(List* list)
 {
-    assert(begin != NULL);
-    Node *p = begin->next;
+    assert(list->begin != NULL);
+    Node *p = list->begin->next;
     
-    free(begin->str);
-    free(begin);
-    
-    return p;
+    free(list->begin->str);
+    free(list->begin);
+    list->begin = p;
+    return list;
 }
 
-Node *push_back(Node *begin, const char *str)
+List *push_back(List* list, const char *str)
 {
-    if (begin == NULL) { 
-	return push_front(begin, str);
+    if (list->begin == NULL) { 
+	    return push_front(list, str);
     }
     
-    Node *p = begin;
+    Node *p = list->begin;
     while (p->next != NULL) {
-	p = p->next;
+	    p = p->next;
     }
     
     Node *q = (Node *)malloc(sizeof(Node));
@@ -56,34 +66,45 @@ Node *push_back(Node *begin, const char *str)
     *q = (Node){.str = s, .next = NULL};
     p->next = q;
     
-    return begin;
+    return list;
 }
 
 // Let's try: pop_back の実装
-Node *pop_back(Node *begin)
+List *pop_back(List* list)
 {
     // write an implementation.
-    
-    return begin;
+    assert(list->begin != NULL);
+    Node* p = list->begin;
+    Node* pp = NULL;
+    while(p->next !=NULL){
+        pp = p;
+        p = p->next;
+    }
+    free(p->str);
+    free(p);
+    if(pp!=NULL){
+        pp->next = NULL;
+    }
+    return list;
 }
 
 
-Node *remove_all(Node *begin)
+List *remove_all(List *list)
 {
-    while ((begin = pop_front(begin))) 
+    while ((list->begin = pop_front(list)->begin)) 
 	; // Repeat pop_front() until the list becomes empty
-    return begin;
+    return list;
 }
 
 int main()
 {
     Node *begin = NULL; 
-    
+    List* list = make_list(begin);
     
     char buf[maxlen];
     while (fgets(buf, maxlen, stdin)) {
-	begin = push_front(begin, buf);
-	//begin = push_back(begin, buf); // Try this instead of push_front()
+	    list = push_front(list, buf);
+	    //begin = push_back(begin, buf); // Try this instead of push_front()
     }
     
     //begin = pop_front(begin);  // What will happen if you do this?
@@ -91,8 +112,8 @@ int main()
     
     //begin = remove_all(begin); // What will happen if you do this?
     
-    for (const Node *p = begin; p != NULL; p = p->next) {
-	printf("%s", p->str);
+    for (const Node *p = list->begin; p != NULL; p = p->next) {
+	    printf("%s", p->str);
     }
     
     return EXIT_SUCCESS;
