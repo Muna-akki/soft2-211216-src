@@ -3,7 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <unistd.h>
+#include <math.h>
+
 typedef struct{
     int width;
     int height;
@@ -246,7 +247,7 @@ void draw_rect(Canvas* c, const int x0, const int y0, const int w0, const int h0
     for(int i=0 ; i<h0 ; i++){
         const int x1 = x0;
         const int y1 = y0+i;
-        const int x2 = x0+w0;
+        const int x2 = x0+w0-1;
         if(x1>=0 && x1<width && y1>=0 && y1<height){
             c->canvas[x1][y1] = pen;
         }
@@ -258,7 +259,7 @@ void draw_rect(Canvas* c, const int x0, const int y0, const int w0, const int h0
     for(int i=0 ; i<w0 ; i++){
         const int x1 = x0+i;
         const int y1 = y0;
-        const int y2 = y0+h0;
+        const int y2 = y0+h0-1;
         if(x1>=0 && x1<width && y1>=0 && y1<height){
             c->canvas[x1][y1] = pen;
         }
@@ -270,7 +271,38 @@ void draw_rect(Canvas* c, const int x0, const int y0, const int w0, const int h0
 
 void draw_circle(Canvas* c, const int x0, const int y0, const int r0){
     const int width = c->width;
-    const int height
+    const int height = c->height;
+    char pen = c->pen;
+    for(int x=x0-r0+1 ; x<=x0+r0-1 ; x++){
+        int miny = 0;
+        double minval = width*height;
+        for(int y=y0-r0+1 ; y<=y0+r0-1 ; y++){
+            double dx = x-x0;
+            double dy = y-y0;
+            double dis = sqrt(dx*dx+dy*dy);
+            if(fabs(dis-r0)<minval){
+                miny = y;
+                minval = dis-r0;
+            }
+        }
+        if(x>=0 && x<width && miny>=0 && miny<height){
+            c->canvas[x][(int)miny] = pen;
+        }
+        double miny2 = 2*y0-miny;
+        if(x>=0 && x<width && miny2>=0 && miny2<height){
+            c->canvas[x][(int)miny2] = pen;
+        }
+        double y1 = (miny>miny2) ? miny:miny2;
+        double y2 = (miny>miny2) ? miny2:miny;
+        if(x==x0-r0+1 || x==x0+r0-1){
+            for(int y = y2 ; y<=y1 ; y++){
+                if(x>=0 && x<width && y>=0 && y<height){
+                    c->canvas[x][y] = pen;
+                }
+            }
+        }
+    }
+    
 }
 
 Result interpret_command(const char* command, History* his, Canvas* c){
@@ -356,7 +388,7 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         }
         draw_circle(c,p[0],p[1],p[2]);
         clear_command();
-        printf("1 rectangle drawn\n");
+        printf("1 circle drawn\n");
         return NORMAL;
     }
 

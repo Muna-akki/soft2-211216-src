@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <unistd.h>
+
 typedef struct{
     int width;
     int height;
