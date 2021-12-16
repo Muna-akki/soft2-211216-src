@@ -39,8 +39,6 @@ typedef enum res{EXIT, NORMAL, COMMAND, UNKNOWN, ERROR} Result;
 
 int max(const int a, const int b);
 void draw_line(Canvas* c, const int x0, const int y0, const int x1, const int y1);
-void draw_rect(Canvas* c, const int x0, const int y0, const int w0, const int h0);
-void draw_circle(Canvas* c, const int x0, const int y0, const int r0);
 Result interpret_command(const char* command, History* his, Canvas* c);
 void save_history(const char *filename, History* his);
 
@@ -237,41 +235,6 @@ void draw_line(Canvas* c, const int x0, const int y0, const int x1, const int y1
     }
 }
 
-void draw_rect(Canvas* c, const int x0, const int y0, const int w0, const int h0){
-    const int width = c->width;
-    const int height = c->height;
-    char pen = c->pen;
-
-    //縦
-    for(int i=0 ; i<h0 ; i++){
-        const int x1 = x0;
-        const int y1 = y0+i;
-        const int x2 = x0+w0;
-        if(x1>=0 && x1<width && y1>=0 && y1<height){
-            c->canvas[x1][y1] = pen;
-        }
-        if(x2>=0 && x2<width && y1>=0 && y1<height){
-            c->canvas[x2][y1] = pen;
-        }
-    }
-    //横
-    for(int i=0 ; i<w0 ; i++){
-        const int x1 = x0+i;
-        const int y1 = y0;
-        const int y2 = y0+h0;
-        if(x1>=0 && x1<width && y1>=0 && y1<height){
-            c->canvas[x1][y1] = pen;
-        }
-        if(x1>=0 && x1<width && y2>=0 && y2<height){
-            c->canvas[x1][y2] = pen;
-        }
-    }
-}
-
-void draw_circle(Canvas* c, const int x0, const int y0, const int r0){
-    const int width = c->width;
-    const int height
-}
 
 Result interpret_command(const char* command, History* his, Canvas* c){
     char* buf = (char*)malloc(strlen(command)+1);
@@ -306,60 +269,7 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         return NORMAL;
     }
 
-    if(strcmp(s, "rect")==0){
-        int p[4] = {0};
-        char* b[4];
-        for(int i=0 ; i<4 ; i++){
-            b[i] = strtok(NULL," ");
-            if(b[i] == NULL){
-                clear_command();
-                printf("the number of point is not enough.\n");
-                return ERROR;
-            }
-        }
-        for(int i=0 ; i<4 ; i++){
-            char* e;
-            long v = strtol(b[i],&e,10);
-            if(*e != '\0'){
-                clear_command();
-                printf("Non-int value is included.\n");
-                return ERROR;
-            }
-            p[i] = (int)v;
-        }
-        draw_rect(c,p[0],p[1],p[2],p[3]);
-        clear_command();
-        printf("1 rectangle drawn\n");
-        return NORMAL;
-    }
-
-    if(strcmp(s, "circle")==0){
-        int p[3] = {0};
-        char* b[3];
-        for(int i=0 ; i<3 ; i++){
-            b[i] = strtok(NULL," ");
-            if(b[i] == NULL){
-                clear_command();
-                printf("the number of point is not enough.\n");
-                return ERROR;
-            }
-        }
-        for(int i=0 ; i<3 ; i++){
-            char* e;
-            long v = strtol(b[i],&e,10);
-            if(*e != '\0'){
-                clear_command();
-                printf("Non-int value is included.\n");
-                return ERROR;
-            }
-            p[i] = (int)v;
-        }
-        draw_circle(c,p[0],p[1],p[2]);
-        clear_command();
-        printf("1 rectangle drawn\n");
-        return NORMAL;
-    }
-
+    
     if(strcmp(s, "save")==0){
         s = strtok(NULL, " ");
         save_history(s, his);
