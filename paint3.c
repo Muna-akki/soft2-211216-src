@@ -338,7 +338,7 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         return NORMAL;
     }
 
-    if(strcmp(s, "rect")==0){
+    if(strcmp(s, "rect") == 0){
         int p[4] = {0};
         char* b[4];
         for(int i=0 ; i<4 ; i++){
@@ -365,7 +365,7 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         return NORMAL;
     }
 
-    if(strcmp(s, "circle")==0){
+    if(strcmp(s, "circle") == 0){
         int p[3] = {0};
         char* b[3];
         for(int i=0 ; i<3 ; i++){
@@ -392,14 +392,27 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         return NORMAL;
     }
 
-    if(strcmp(s, "save")==0){
+    if(strcmp(s, "chpen") == 0){
+        s = strtok(NULL, " ");
+        if(strlen(s)!=1){
+            clear_command();
+            fprintf(stderr, "error: %s is not \"one\" character.\n",s);
+        }
+        char past = c->pen;
+        c->pen = s[0];
+        clear_command();
+        printf("pen changed: %c -> %c\n",past, c->pen);
+        return NORMAL;
+    }
+
+    if(strcmp(s, "save") == 0){
         s = strtok(NULL, " ");
         save_history(s, his);
         printf("saved as \"%s\"\n", (s==NULL) ? "history.txt":s);
         return COMMAND;
     }
 
-    if(strcmp(s,"load")==0){
+    if(strcmp(s,"load") == 0){
         s = strtok(NULL, " ");
         const char* default_history_file = "history.txt";
         if(s == NULL){
@@ -431,7 +444,7 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         return COMMAND;
     }
 
-    if(strcmp(s, "undo")==0){
+    if(strcmp(s, "undo") == 0){
         reset_canvas(c);
         Command* p = his->begin;
         if(p != NULL){
