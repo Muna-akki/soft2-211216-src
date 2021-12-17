@@ -424,17 +424,17 @@ Result interpret_command(const char* command, History* his, Canvas* c){
             clear_command();
             fprintf(stderr, "error: cannot open %s.\n", s);
             return ERROR;
-        }
-        //clear_command();
+        } 
         const int bufsize = 1000;
+        char* buf2 = (char*) malloc(bufsize+1);
         unsigned long count = 0;
-        while(fgets(buf, bufsize, fp) != NULL){
-            const Result r = interpret_command(buf, his,c);
+        while(fgets(buf2, bufsize, fp) != NULL){
+            const Result r = interpret_command(buf2, his,c);
             if(r == EXIT){
                 break;
             }
             if(r == NORMAL){
-                push_back(his, buf, bufsize);
+                push_back(his, buf2, bufsize);
             }
             rewind_screen(1);
         }
