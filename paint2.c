@@ -399,6 +399,38 @@ Result interpret_command(const char* command, History* his, Canvas* c){
         return COMMAND;
     }
 
+    if(strcmp(s,"load")==0){
+        s = strtok(NULL, " ");
+        const char* default_history_file = "history.txt";
+        if(s == NULL){
+            s = default_history_file;
+        }
+
+        FILE* fp;
+        if((fp = fopen(s, "r")) == NULL){
+            clear_command();
+            fprintf(stderr, "error: cannot open %s.\n", s);
+            return ERROR;
+        }
+        //clear_command();
+        const int bufsize = 1000;
+        unsigned long count = 0;
+        while(fgets(buf, bufsize, fp) != NULL){
+            const Result r = interpret_command(buf, his,c);
+            if(r == EXIT){
+                break;
+            }
+            if(r == NORMAL){
+                push_back(his, buf, bufsize);
+            }
+            rewind_screen(1);
+        }
+        clear_command();
+        printf("%s is loaded.\n",s);
+        fclose(fp);
+        return COMMAND;
+    }
+
     if(strcmp(s, "undo")==0){
         reset_canvas(c);
         Command* p = his->begin;
