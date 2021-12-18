@@ -394,9 +394,15 @@ Result interpret_command(const char* command, History* his, Canvas* c){
 
     if(strcmp(s, "chpen") == 0){
         s = strtok(NULL, " ");
+        if(s==NULL){
+            clear_command();
+            printf("not include new pen\n");
+            return ERROR;
+        }
         if(strlen(s)!=1){
             clear_command();
             fprintf(stderr, "error: %s is not \"one\" character.\n",s);
+            return ERROR;
         }
         char past = c->pen;
         c->pen = s[0];
